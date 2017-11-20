@@ -1,0 +1,42 @@
+
+        SITEDOMAIN:
+            server_name: SITEDOMAIN
+            server_aliases:
+                - SITEDOMAIN
+            www_root: /var/www/SITEDOMAIN
+            listen_port: '80'
+            client_max_body_size: 1m
+            ssl: '0'
+            rewrite_to_https: '0'
+            spdy: '1'
+            ssl_cert: LETSENCRYPT
+            ssl_key: LETSENCRYPT
+            ssl_port: '443'
+            ssl_protocols: ''
+            ssl_ciphers: ''
+            locations:
+                SITEDOMAIN:
+                    www_root: /var/www/SITEDOMAIN/public_html
+                    location: /
+                    autoindex: 'off'
+                    internal: 'false'
+                    index_files:
+                        - index.html
+                        - index.php
+                        #- app.php
+                    try_files:
+                        - $uri
+                        - $uri/
+                        - /index.php$is_args$args
+                        #- /app.php$is_args$args
+                    fastcgi: '127.0.0.1:9000'
+                    fastcgi_index: index.php
+                    fastcgi_split_path: '^(.+\.php)(/.*)$'
+                    fast_cgi_params_extra:
+                        - 'SCRIPT_FILENAME $document_root$fastcgi_script_name'
+                    # VHOST Variable declaration sample:
+                    #    - 'APP_ENV dev'
+                    set:
+                        - '$path_info $fastcgi_path_info'
+                    proxy: ''
+                    proxy_redirect: ''

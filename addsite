@@ -1,0 +1,36 @@
+#!/bin/bash
+
+VHOST_SKELETON='puphpet/vhost.skeleton.yaml'
+CONFIG_FILE='puphpet/config.yaml'
+
+echo "Enter your project URL (e.g.: local.sample.com): "
+read PROJECTURL
+
+cat "$VHOST_SKELETON" >> "$CONFIG_FILE"
+find "$CONFIG_FILE" -type f -exec sed -i "" "s/SITEDOMAIN/$PROJECTURL/g" {} \;
+
+echo "\nEnter the remote repository (e.g.: git@github.com:fsspencer/codealist-vagrant-magento2.git): "
+read REPOREMOTE
+
+echo "\nEnter the remote repository custom alias (e.g.: codealist): "
+read REPOREMOTEALIAS
+
+echo "\nEnter your fork repository (e.g.: git@github.com:yourusername/codealist-vagrant-magento2.git): "
+read REPOFORK
+
+echo "\nYour fork's alias will be: origin \n"
+
+if [ ! -d "./projects/$PROJECTURL/public_html" ]; then
+	mkdir -p ./projects/$PROJECTURL/public_html
+fi
+
+cd ./projects/$PROJECTURL/public_html
+git init
+git remote add origin $REPOFORK
+git remote add $REPOREMOTEALIAS $REPOREMOTE
+git pull $REPOREMOTEALIAS master
+
+vagrant reload
+vagrant provision
+
+echo "\nNow make sure to create and import your Database from your vagrant box"
