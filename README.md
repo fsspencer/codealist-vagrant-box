@@ -1,5 +1,5 @@
 # Codealist Vagrant Box 
-This is a simple vagrant box initially created for Magento 2 usages. It has been built using PuPHPet with a couple of modifications and agregations to it.
+This is a simple vagrant box initially built using PuPHPet with a couple of modifications and agregations to it.
 ## Specifications
 - Nginx
 - PHP 7.0
