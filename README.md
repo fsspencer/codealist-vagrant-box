@@ -32,7 +32,7 @@ Within your local environment (NOT inside your vagrant box) execute the followin
 
 This script will ask you for a couple of parameters in order to create a new virtual host in your vagrant box, after that it will reload and provision it by creating your new site.
 
-####Optional Features:
+### Optional Features:
 - Download project from Git repository
 - Create empty database
 - Create and import SQL database
