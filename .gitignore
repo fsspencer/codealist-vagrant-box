@@ -1,5 +1,6 @@
+
 /projects/*
-!/projects/local.codealist.net/public_html/index.php
+!/projects/local.codealist.net
 .DS_Store
 /.vagrant
 /puphpet/config.yaml
