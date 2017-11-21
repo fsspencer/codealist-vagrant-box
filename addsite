@@ -2,35 +2,65 @@
 
 VHOST_SKELETON='puphpet/vhost.skeleton.yaml'
 CONFIG_FILE='puphpet/config.yaml'
+SEPARATOR="-------------------------------------------------------"
 
-echo "Enter your project URL (e.g.: local.sample.com): "
-read PROJECTURL
+read -r -p "Enter your project URL (e.g.: local.sample.com): " PROJECTURL
 
 cat "$VHOST_SKELETON" >> "$CONFIG_FILE"
 find "$CONFIG_FILE" -type f -exec sed -i "" "s/SITEDOMAIN/$PROJECTURL/g" {} \;
-
-echo "\nEnter the remote repository (e.g.: git@github.com:fsspencer/codealist-vagrant-magento2.git): "
-read REPOREMOTE
-
-echo "\nEnter the remote repository custom alias (e.g.: codealist): "
-read REPOREMOTEALIAS
-
-echo "\nEnter your fork repository (e.g.: git@github.com:yourusername/codealist-vagrant-magento2.git): "
-read REPOFORK
-
-echo "\nYour fork's alias will be: origin \n"
 
 if [ ! -d "./projects/$PROJECTURL/public_html" ]; then
 	mkdir -p ./projects/$PROJECTURL/public_html
 fi
 
-cd ./projects/$PROJECTURL/public_html
-git init
-git remote add origin $REPOFORK
-git remote add $REPOREMOTEALIAS $REPOREMOTE
-git pull $REPOREMOTEALIAS master
+read -r -p "Do you want to download the code from a repository? (Y/n): " DOWNLOADFROMREPO
+if [[ "$DOWNLOADFROMREPO" =~ ^([yY][eE][sS]|[yY])+$ ]]
+then
+	read -r -p "Enter the remote repository (e.g.: git@github.com:fsspencer/codealist-vagrant-magento2.git): " REPOREMOTE
 
-vagrant reload
-vagrant provision
+	read -r -p "Enter the remote repository custom alias (e.g.: codealist): " REPOREMOTEALIAS
+	echo "Now you can use it as it follows: git pull $REPOREMOTEALIAS master"
 
-echo "\nNow make sure to create and import your Database from your vagrant box"
+	read -r -p "Enter your fork repository (e.g.: git@github.com:yourusername/codealist-vagrant-magento2.git): " REPOFORK
+
+	echo "Your fork's alias will be: origin "
+
+	cd ./projects/$PROJECTURL/public_html
+	git init
+	git remote add origin $REPOFORK
+	git remote add $REPOREMOTEALIAS $REPOREMOTE
+	git pull $REPOREMOTEALIAS master
+else
+	touch ./projects/$PROJECTURL/public_html/index.php
+	echo "<?php echo 'Welcome to $PROJECTURL'" > ./projects/$PROJECTURL/public_html/index.php
+fi
+
+echo $SEPARATOR
+vagrant up 2> /dev/null
+echo $SEPARATOR
+
+read -r -p "Do you want to import a SQL dump? (Y/n): " IMPORTDB
+if [[ "$IMPORTDB" =~ ^([yY][eE][sS]|[yY])+$ ]]
+then
+    read -r -p "Enter your SQL file location: " SQLPATH
+    cp $SQLPATH ./tmp.sql
+
+    read -r -p "Enter your database name: " DB
+    vagrant -- -t "mysql -uroot -proot -e 'create database if not exists $DB;' && mysql -uroot -proot $DB < /vagrant/tmp.sql" 2> /dev/null
+
+    rm ./tmp.sql
+else
+	read -r -p "Do you want to create a Database? (Y/n): " CREATEDB
+	if [[ "$CREATEDB" =~ ^([yY][eE][sS]|[yY])+$ ]]
+	then
+	    read -r -p "Enter your database name: " DBNAME
+	    vagrant -- -t "mysql -uroot -proot -e 'create database $DBNAME;'" 2> /dev/null
+	fi
+fi
+
+echo $SEPARATOR
+vagrant reload 2> /dev/null
+vagrant provision 2> /dev/null
+echo $SEPARATOR
+
+echo "\nFINISHED!"
