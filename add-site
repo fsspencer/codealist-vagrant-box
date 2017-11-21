@@ -60,4 +60,4 @@ vagrant reload --no-tty
 vagrant provision --no-tty
 
 echo $SEPARATOR
-echo "\nFINISHED!"
+echo "FINISHED!"

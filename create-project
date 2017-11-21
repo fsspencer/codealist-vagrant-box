@@ -1,0 +1,60 @@
+#!/bin/bash
+
+VHOST_SKELETON='puphpet/vhost.skeleton.yaml'
+CONFIG_FILE='puphpet/config.yaml'
+SEPARATOR="-------------------------------------------------------"
+
+read -r -p "Enter Project Name (lowercase): " PROJECTNAME
+
+PROJECTURL='local.$PROJECTNAME.com'
+
+cat "$VHOST_SKELETON" >> "$CONFIG_FILE"
+find "$CONFIG_FILE" -type f -exec sed -i "" "s/SITEDOMAIN/$PROJECTURL/g" {} \;
+
+if [ ! -d "./projects/$PROJECTURL/public_html" ]; then
+	mkdir -p ./projects/$PROJECTURL/public_html
+	vagrant -- -t "mysql -uroot -proot -e 'create database $PROJECTNAME;'" --no-tty
+fi
+
+# Select Project Type
+echo "\nProjects Path?: [ENTER OPTION NUMBER]"
+echo "0: Empty"
+echo "1: Magento Open Source 2"
+echo "2: Magento Commerce 2"
+echo "3: Laravel"
+echo "4: Wordpress"
+echo "5: Slim"
+echo "6: Symfony"
+
+read -r -p "Your selection: " TYPE
+
+echo $SEPARATOR
+if [ $TYPE = "0" ]; then
+	touch ./projects/$PROJECTURL/public_html/index.php
+	echo "<?php echo 'Welcome to $PROJECTURL'" > ./projects/$PROJECTURL/public_html/index.php
+else if [ $TYPE = "1" ]; then
+	vagrant -- --no-tty "cd /var/www/$PROJECTURL/public_html && composer create-project magento/magento2ce ./" 
+else if [ $TYPE = "2" ]; then
+	vagrant -- --no-tty "cd /var/www/$PROJECTURL/public_html && composer create-project --repository-url=https://repo.magento.com/ magento/project-enterprise-edition ./" 
+else if [ $TYPE = "3" ]; then
+	vagrant -- --no-tty "cd /var/www/$PROJECTURL/public_html && composer create-project laravel/laravel ./ --prefer-dist" 
+else if [ $TYPE = "4" ]; then
+	vagrant -- --no-tty "cd /var/www/$PROJECTURL/public_html && git clone https://github.com/WordPress/WordPress && rm -rf .git" 
+else if [ $TYPE = "5" ]; then
+	vagrant -- --no-tty "cd /var/www/$PROJECTURL/public_html && composer create-project slim/slim ./" 
+else if [ $TYPE = "6" ]; then
+	vagrant -- --no-tty "cd /var/www/$PROJECTURL/public_html && composer create-project symfony/framework-standard-edition ./" 
+fi
+
+echo $SEPARATOR
+vagrant reload --no-tty
+vagrant provision --no-tty
+echo $SEPARATOR
+
+echo "\nDATABASE: $PROJECTNAME"
+echo "PROJECT PATH: /var/www/$PROJECTURL/public_html"
+echo "PROJECT URL: http://$PROJECTURL/"
+
+echo $SEPARATOR
+
+echo "\nFINISHED!"

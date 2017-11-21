@@ -11,29 +11,52 @@ This is a simple vagrant box initially created for Magento 2 usages. It has been
 - ElasticSearch
 
 ## Usage
-Clone the repository 
+1 - Clone the repository 
 >git clone https://github.com/fsspencer/codealist-vagrant-magento2 
 
-Turn on your vagrant box
+2 - Copy the ./puphpet/config.yaml.sample to ./puphpet/config.yaml
+
+3 - Turn on your vagrant box
 >vagrant up
 
-You can make any change you want within the puphpet/config.yaml file, after you modify it you need to provision your vagrant box by executing the following:
+4 - You can make any change you want within the puphpet/config.yaml file, after you modify it you need to provision your vagrant box by executing the following:
 >vagrant provision
 
-Once you get your vagrant initialized, go to your web browser and enter the following URL:
+5 - Once you get your vagrant initialized, go to your web browser and enter the following URL:
 >http://local.codealist.net
 
 The output should be a phpinfo()
 ## Add a new site
-Within your local environment (NOT the vagrant box) execute the following
->sh addsite
+Within your local environment (NOT inside your vagrant box) execute the following
+>./add-site
 
 This script will ask you for a couple of parameters in order to create a new virtual host in your vagrant box, after that it will reload and provision it by creating your new site.
 
-Your project code will be located in the directory projects/[YOUR-SITE-URL].
+####Optional Features:
+- Download project from Git repository
+- Create empty database
+- Create and import SQL database
 
-After that you need to login via ssh to your vagrant and add your database.
-## Paramters
+Your project code will be located in the directory projects/**[YOUR-SITE-URL]**.
+
+## Create Project
+Within your local environment (NOT inside your vagrant box) execute the following
+>./create-project
+
+This script will create an empty project by giving you the following options:
+
+- Empty Project
+- Magento Open Source 2
+- Magento Commerce 2
+- Laravel
+- Wordpress
+- Slim
+- Symfony
+
+Your project code will be located in the directory projects/local.**project-name**.com.
+
+It will also create a database named as your project.
+## Parameters
 - **IP:** 192.168.56.101
 - **HOSTNAME:** local.codealist
 - **RAM:** 4096
